@@ -1,0 +1,9 @@
+{
+  "name": "jexl-to-string",
+  "version": "2.3.0",
+  "description": "Convert a Jexl expression AST back to a string",
+  "main": "dist/index.js",
+  "repository": "https://github.com/chetbox/jexl-to-string",
+  "author": "Chetan Padia <chetbox@noreply.users.github.com>",
+  "license": "MIT"
+}
