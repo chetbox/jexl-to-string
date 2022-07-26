@@ -1,5 +1,5 @@
 import { jexlExpressionStringFromAst } from "..";
-import { Jexl } from 'jexl'
+import { Jexl } from "jexl";
 
 describe("jexlExpressionStringFromAst", () => {
   // Create a Jexl AST from an expression and then convert back to an expression and see if it looks right
