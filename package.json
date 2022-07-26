@@ -7,10 +7,15 @@
   "author": "Chetan Padia <chetbox@noreply.users.github.com>",
   "license": "MIT",
   "devDependencies": {
+    "@types/jest": "^28.1.6",
     "@types/jexl": "^2.3.1",
+    "jest": "^28.1.3",
+    "jexl": "^2.3.0",
+    "ts-jest": "^28.0.7",
     "typescript": "^4.7.4"
   },
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "test": "jest"
   }
 }
