@@ -42,8 +42,16 @@ export function jexlExpressionStringFromAst(
       } else {
         return escapeKeyOfExpressionIdentifier(ast.value);
       }
-    case "UnaryExpression":
-      return `${ast.operator}${recur(ast.right)}`;
+    case "UnaryExpression": {
+      let right = recur(ast.right);
+      if (
+        ast.right.type === "BinaryExpression" ||
+        ast.right.type === "UnaryExpression"
+      ) {
+        right = `(${right})`;
+      }
+      return `${ast.operator}${right}`;
+    }
     case "BinaryExpression": {
       const element = grammar.elements[ast.operator];
       const precedence =

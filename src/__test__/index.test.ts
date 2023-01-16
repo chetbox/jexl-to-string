@@ -26,6 +26,11 @@ describe("jexlExpressionStringFromAst", () => {
     ["a.b[e.f].c[g.h].d", null],
     ["a[c][d].b", null],
     ["(a ? b : c) + (d && (e || f))", null],
+    ["!a", null],
+    ["!(a && b)", null],
+    ["!a[b]", null],
+    ["!a ? b : c", null],
+    ["!(a ? b : c)", null],
     [
       '(z + 0) + " A " + (a + 1) + " B " + (b + 2) + " C " + (c == 0 ? "c1" : "c2")',
       'z + 0 + " A " + (a + 1) + " B " + (b + 2) + " C " + (c == 0 ? "c1" : "c2")',
