@@ -30,6 +30,7 @@ describe("jexlExpressionStringFromAst", () => {
       '(z + 0) + " A " + (a + 1) + " B " + (b + 2) + " C " + (c == 0 ? "c1" : "c2")',
       'z + 0 + " A " + (a + 1) + " B " + (b + 2) + " C " + (c == 0 ? "c1" : "c2")',
     ],
+    ["a ? b1 ? b2 : b3 : c1 ? c2 : c3", null],
   ];
 
   test.each(expressions)("`%s`", (input, expected) => {
