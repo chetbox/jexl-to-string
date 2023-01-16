@@ -1,5 +1,5 @@
 import JexlAst from "jexl/Ast";
-import JexlGrammar from "jexl/Grammar";
+import JexlGrammar, { Element as JexlElement } from "jexl/Grammar";
 
 export function escapeKeyOfExpressionIdentifier(
   identifier: string,
@@ -19,15 +19,43 @@ export function escapeKeyOfExpressionIdentifier(
 
 export function jexlExpressionStringFromAst(
   grammar: JexlGrammar,
-  ast: JexlAst | null,
-  depth = 0
+  ast: JexlAst | null
 ): string {
   if (!ast) {
     return "";
   }
 
-  const recur = (ast: JexlAst) =>
-    jexlExpressionStringFromAst(grammar, ast, depth + 1);
+  const recur = (ast: JexlAst) => jexlExpressionStringFromAst(grammar, ast);
+
+  const recurWithBracketsIfRequired = (
+    parentElement: JexlElement | null,
+    childAst: JexlAst,
+    { isRightHandSide = false }: { isRightHandSide?: boolean } = {}
+  ): string => {
+    const parentPrecedence =
+      parentElement?.type === "binaryOp" ? parentElement.precedence : 0;
+
+    const childBinaryExpressionElement =
+      childAst.type === "BinaryExpression"
+        ? grammar.elements[childAst.operator]
+        : null;
+    const childPrecedence =
+      childAst.type === "ConditionalExpression"
+        ? 0
+        : childBinaryExpressionElement?.type === "binaryOp"
+        ? childBinaryExpressionElement.precedence
+        : Infinity;
+
+    const childExpressionString = recur(childAst);
+    if (
+      isRightHandSide
+        ? parentPrecedence >= childPrecedence
+        : parentPrecedence > childPrecedence
+    ) {
+      return `(${childExpressionString})`;
+    }
+    return childExpressionString;
+  };
 
   switch (ast.type) {
     case "Literal":
@@ -45,43 +73,22 @@ export function jexlExpressionStringFromAst(
     case "UnaryExpression":
       return `${ast.operator}${recur(ast.right)}`;
     case "BinaryExpression": {
-      const element = grammar.elements[ast.operator];
-      const precedence =
-        element.type === "binaryOp" ? element.precedence : Infinity;
-
-      const leftBinaryExpressionElement =
-        ast.left.type === "BinaryExpression"
-          ? grammar.elements[ast.left.operator]
-          : null;
-      const leftPrecedence =
-        leftBinaryExpressionElement?.type === "binaryOp"
-          ? leftBinaryExpressionElement.precedence
-          : Infinity;
-      let left = recur(ast.left);
-      if (precedence > leftPrecedence) {
-        left = `(${left})`;
-      }
-
-      const rightBinaryExpressionElement =
-        ast.right.type === "BinaryExpression"
-          ? grammar.elements[ast.right.operator]
-          : null;
-      const rightPrecedence =
-        rightBinaryExpressionElement?.type === "binaryOp"
-          ? rightBinaryExpressionElement.precedence
-          : Infinity;
-      let right = recur(ast.right);
-      if (precedence >= rightPrecedence) {
-        right = `(${right})`;
-      }
-
+      const left = recurWithBracketsIfRequired(
+        grammar.elements[ast.operator],
+        ast.left
+      );
+      const right = recurWithBracketsIfRequired(
+        grammar.elements[ast.operator],
+        ast.right,
+        { isRightHandSide: true }
+      );
       return `${left} ${ast.operator} ${right}`;
     }
     case "ConditionalExpression": {
-      const expressionString = `${recur(ast.test)} ? ${recur(
-        ast.consequent
-      )} : ${recur(ast.alternate)}`;
-      return depth > 0 ? `(${expressionString})` : expressionString;
+      const test = recurWithBracketsIfRequired(null, ast.test);
+      const consequent = recurWithBracketsIfRequired(null, ast.consequent);
+      const alternate = recurWithBracketsIfRequired(null, ast.alternate);
+      return `${test} ? ${consequent} : ${alternate}`;
     }
     case "ArrayLiteral":
       return `[${ast.value.map(recur).join(", ")}]`;
