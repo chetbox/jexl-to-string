@@ -61,7 +61,7 @@ export function jexlExpressionStringFromAst(
     case "Literal":
       if (typeof ast.value === 'number' && ast.value.toString().includes("e")) {
         const prefix = ast.value < 0 ? "-" : ""
-        return prefix + Math.abs(ast.value).toLocaleString('fullwide', { useGrouping: false })
+        return prefix + Math.abs(ast.value).toLocaleString("en-US", { useGrouping: false })
       }
       return JSON.stringify(ast.value);
     case "Identifier":
