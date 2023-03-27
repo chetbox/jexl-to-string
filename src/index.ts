@@ -59,6 +59,10 @@ export function jexlExpressionStringFromAst(
 
   switch (ast.type) {
     case "Literal":
+      if (typeof ast.value === 'number' && ast.value.toString().includes("e")) {
+        const prefix = ast.value < 0 ? "-" : ""
+        return prefix + Math.abs(ast.value).toLocaleString('fullwide', { useGrouping: false })
+      }
       return JSON.stringify(ast.value);
     case "Identifier":
       // TODO: if identifierAst can generate FilterExpressions when required then can we ditch `escapeKeyOfExpressionIdentifier`?

@@ -8,6 +8,11 @@ describe("jexlExpressionStringFromAst", () => {
     ["true", "true"],
     ["'hello world'", '"hello world"'], // We always use double quotes
     ["123.0", "123"],
+    ["-123.0", "-123"],
+    ["123456789101112131415161718", "123456789101112140000000000"],
+    ["-123456789101112131415161718", "-123456789101112140000000000"],
+    ["8.27936475869709331257", "8.279364758697094"],
+    ["-8.27936475869709331257", "-8.279364758697094"],
     ["foo .bar .baz", "foo.bar.baz"],
     ['foo["bar"].baz', null], // Stays as filter syntax
     ["foo  ? bar  : baz", "foo ? bar : baz"],
