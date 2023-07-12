@@ -106,7 +106,7 @@ export function jexlExpressionStringFromAst(
       return `[${ast.value.map(recur).join(", ")}]`;
     case "ObjectLiteral":
       return `{ ${Object.entries(ast.value)
-        .map(([key, value]) => `${key}: ${recur(value)}`)
+        .map(([key, value]) => `"${key}": ${recur(value)}`)
         .join(", ")} }`;
     case "FilterExpression":
       return `${recur(ast.subject)}[${ast.relative ? "." : ""}${recur(
