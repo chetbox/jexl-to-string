@@ -16,7 +16,11 @@ describe("jexlExpressionStringFromAst", () => {
     ["foo .bar .baz", "foo.bar.baz"],
     ['foo["bar"].baz', null], // Stays as filter syntax
     ["foo  ? bar  : baz", "foo ? bar : baz"],
-    ["{ one: a.value, two: b.value }", "{ one: a.value, two: b.value }"], // Keys are not escaped. Keys in quotes give a Jexl syntax error
+    ["{ one: a.value, two: b.value }", '{ "one": a.value, "two": b.value }'],
+    [
+      '{ "one a": a.value, "two b": b.value }',
+      '{ "one a": a.value, "two b": b.value }',
+    ],
     ["! foo", "!foo"],
     ["foo.bar   ==   foo.baz", "foo.bar == foo.baz"],
     ['[true,"two",3]', '[true, "two", 3]'],
