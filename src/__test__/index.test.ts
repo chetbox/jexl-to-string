@@ -41,6 +41,9 @@ describe("jexlExpressionStringFromAst", () => {
       'z + 0 + " A " + (a + 1) + " B " + (b + 2) + " C " + (c == 0 ? "c1" : "c2")',
     ],
     ["a ? b1 ? b2 : b3 : c1 ? c2 : c3", null],
+    ["a < b | c", null],
+    ["a < (b | c) ? true : false", null], // Jexl can't parse this if the brackets are removed
+    ["a | b < c ? true : false", null],
   ];
 
   test.each(expressions)("`%s`", (input, expected) => {

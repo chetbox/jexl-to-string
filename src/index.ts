@@ -19,13 +19,15 @@ export function escapeKeyOfExpressionIdentifier(
 
 export function jexlExpressionStringFromAst(
   grammar: JexlGrammar,
-  ast: JexlAst | null
+  ast: JexlAst | null,
+  ancestors: JexlAst[] = []
 ): string {
   if (!ast) {
     return "";
   }
 
-  const recur = (ast: JexlAst) => jexlExpressionStringFromAst(grammar, ast);
+  const recur = (childAst: JexlAst) =>
+    jexlExpressionStringFromAst(grammar, childAst, [...ancestors, ast]);
 
   const recurWithBracketsIfRequired = (
     parentElement: JexlElement | null,
@@ -46,10 +48,18 @@ export function jexlExpressionStringFromAst(
         ? childBinaryExpressionElement.precedence
         : Infinity;
 
+    const rhsOfBinaryOpInTernaryConditionWorkaround =
+      isRightHandSide &&
+      childAst.type === "FunctionCall" &&
+      childAst.pool === "transforms" &&
+      parentElement?.type === "binaryOp" &&
+      ancestors[ancestors.length - 1]?.type === "ConditionalExpression";
+
     const childExpressionString = recur(childAst);
     if (
       isRightHandSide
-        ? parentPrecedence >= childPrecedence
+        ? parentPrecedence >= childPrecedence ||
+          rhsOfBinaryOpInTernaryConditionWorkaround
         : parentPrecedence > childPrecedence
     ) {
       return `(${childExpressionString})`;
@@ -59,9 +69,12 @@ export function jexlExpressionStringFromAst(
 
   switch (ast.type) {
     case "Literal":
-      if (typeof ast.value === 'number' && ast.value.toString().includes("e")) {
-        const prefix = ast.value < 0 ? "-" : ""
-        return prefix + Math.abs(ast.value).toLocaleString("en-US", { useGrouping: false })
+      if (typeof ast.value === "number" && ast.value.toString().includes("e")) {
+        const prefix = ast.value < 0 ? "-" : "";
+        return (
+          prefix +
+          Math.abs(ast.value).toLocaleString("en-US", { useGrouping: false })
+        );
       }
       return JSON.stringify(ast.value);
     case "Identifier":
