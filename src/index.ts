@@ -85,7 +85,7 @@ export function jexlExpressionStringFromAst(
           ast.value
         )}`;
       } else {
-        return escapeKeyOfExpressionIdentifier(ast.value);
+        return `${ast.relative ? "." : ""}${escapeKeyOfExpressionIdentifier(ast.value)}`;
       }
     case "UnaryExpression": {
       let right = recur(ast.right);
@@ -122,9 +122,7 @@ export function jexlExpressionStringFromAst(
         .map(([key, value]) => `${key}: ${recur(value)}`)
         .join(", ")} }`;
     case "FilterExpression":
-      return `${recur(ast.subject)}[${ast.relative ? "." : ""}${recur(
-        ast.expr
-      )}]`;
+      return `${recur(ast.subject)}[${recur(ast.expr)}]`;
     case "FunctionCall":
       switch (ast.pool) {
         case "functions":
