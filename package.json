@@ -1,6 +1,6 @@
 {
   "name": "jexl-to-string",
-  "version": "2.3.4",
+  "version": "2.3.5",
   "description": "Convert a Jexl expression AST back to a string",
   "main": "dist/index.js",
   "files": [
